@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Little Birthday Scrapbook</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#dceafa;color:#34445c;font-family:Georgia,serif}
+#book{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+#cover,.spread{width:min(100%,1000px);aspect-ratio:1.6;max-height:85vh}
+#cover{background:#b8d2f0;border:10px solid #f7f5f0;box-shadow:0 12px 35px #8297b455;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:5px}
+h1{font-size:clamp(25px,5vw,55px);margin:12px}
+p{font-size:clamp(12px,2vw,19px)}
+button{border:1px solid #a5b9d2;background:#f8f7f3;color:#34445c;padding:10px 17px;border-radius:25px;font:inherit;cursor:pointer}
+#open{margin-top:20px}
+.spread{display:none;grid-template-columns:1fr 1fr;box-shadow:0 12px 35px #8297b455;perspective:1200px}
+.page{background:#fffdf8;border:1px solid #e6e0d7;padding:clamp(12px,3vw,35px);position:relative;overflow:hidden}
+.page:first-child{border-radius:5px 0 0 5px}
+.page:last-child{border-radius:0 5px 5px 0}
+.page:after{content:"";position:absolute;top:0;bottom:0;width:12px;pointer-events:none}
+.page:first-child:after{right:0;background:linear-gradient(90deg,transparent,#d8d3ca55)}
+.page:last-child:after{left:0;background:linear-gradient(90deg,#d8d3ca55,transparent)}
+.blank{height:100%;border:1px dashed #d9dce5;border-radius:3px;background:linear-gradient(145deg,#fffdf8,#f9fbff)}
+#controls{display:none;justify-content:center;align-items:center;gap:12px;margin-top:14px;font-family:Arial,sans-serif}
+#count{font-size:13px}
+#hint{display:none;text-align:center;font:12px Arial,sans-serif;color:#53647c;margin:8px}
+@keyframes turn{from{transform:rotateY(-9deg);opacity:.5}to{transform:rotateY(0);opacity:1}}
+.turn{animation:turn .35s ease}
+@media(orientation:portrait){
+#book{flex-direction:column}
+#cover,.spread{width:94vw;aspect-ratio:1.6}
+#hint{display:block}
+}
+</style>
+</head>
+<body>
+<div id="book">
+<section id="cover">
+<p>✦ A LITTLE SCRAPBOOK ✦</p>
+<h1>Happy 20th Birthday</h1>
+<p>made with love ♡</p>
+<button id="open">Open the book →</button>
+</section>
+
+<section class="spread" id="spread">
+<div class="page"><div class="blank"></div></div>
+<div class="page"><div class="blank"></div></div>
+</section>
+</div>
+
+<div id="controls">
+<button id="prev">← Back</button>
+<span id="count">Spread 1 / 5</span>
+<button id="next">Next →</button>
+</div>
+<p id="hint">For the best view, turn your phone sideways.</p>
+
+<script>
+const cover=document.getElementById("cover");
+const spread=document.getElementById("spread");
+const controls=document.getElementById("controls");
+const count=document.getElementById("count");
+let page=0;
+const total=5;
+
+function show(){
+  count.textContent="Spread "+(page+1)+" / "+total;
+  spread.classList.remove("turn");
+  void spread.offsetWidth;
+  spread.classList.add("turn");
+  document.querySelectorAll(".blank").forEach((el,i)=>{
+    el.style.background= i%2===0
+      ?"linear-gradient(145deg,#fffdf8,#f9fbff)"
+      :"linear-gradient(145deg,#f9fbff,#fffdf8)";
+  });
+}
+document.getElementById("open").onclick=()=>{
+  cover.style.display="none";
+  spread.style.display="grid";
+  controls.style.display="flex";
+  show();
+};
+document.getElementById("next").onclick=()=>{
+  if(page<total-1){page++;show();}
+};
+document.getElementById("prev").onclick=()=>{
+  if(page>0){page--;show();}
+};
+let startX=0;
+spread.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+spread.addEventListener("touchend",e=>{
+  let diff=e.changedTouches[0].clientX-startX;
+  if(diff<-45)document.getElementById("next").click();
+  if(diff>45)document.getElementById("prev").click();
+});
+</script>
+</body>
+</html>
